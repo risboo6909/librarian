@@ -1,5 +1,3 @@
-module gitlab.ozon.ru/internal-projects/job-ozon-api
-
 go 1.14
 
 require (
