@@ -8,7 +8,7 @@ use log::{error, info};
 
 type StringPair = (String, String);
 
-type Err = Box<dyn std::error::Error + Send + Sync>;
+pub type Err = Box<dyn std::error::Error + Send + Sync>;
 type MyErr = (String, Err);
 
 type MyResult = Result<Result<StringPair, MyErr>, async_std::future::TimeoutError>;
@@ -111,4 +111,7 @@ mod tests {
         // ...and this one should fail
         assert!(res["https://dsfs"].is_err());
     }
+}
+pub(crate) async fn crawl(urls: &[&str]) {
+    let client = surf::Client::new();
 }
