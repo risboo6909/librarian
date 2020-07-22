@@ -30,10 +30,6 @@ fn test_parse() {
 
     parsed_file.sort();
     compare.sort();
-
-    assert_eq!(parsed_file, compare);
-    parsed_file.sort();
-    compare.sort();
     assert_eq!(parsed_file, compare);
 }
 
