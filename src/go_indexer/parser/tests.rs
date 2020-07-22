@@ -1,6 +1,5 @@
-use crate::parser::{fetch, parse};
-use std::fs;
 use surf;
+use super::{fetch, parse};
 
 #[test]
 fn test_parse() {

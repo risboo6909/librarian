@@ -1,4 +1,7 @@
 mod crawler;
-mod parser;
+mod go_indexer;
+mod indexer;
 
-fn main() {}
+fn main() {
+
+}

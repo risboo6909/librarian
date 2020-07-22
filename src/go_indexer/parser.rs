@@ -1,9 +1,11 @@
 #[cfg(test)]
 mod tests;
-use crate::crawler::Err;
+
 use regex::Regex;
 use std::collections::HashMap;
 use surf;
+
+use crate::crawler::Err;
 
 /// Parses go.mod file fetching github/gitlab unique link
 /// and returning a vector of parsed links as strings

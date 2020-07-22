@@ -112,6 +112,3 @@ mod tests {
         assert!(res["https://dsfs"].is_err());
     }
 }
-pub(crate) async fn crawl(urls: &[&str]) {
-    let client = surf::Client::new();
-}
