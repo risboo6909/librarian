@@ -1,4 +1,6 @@
-use crate::gomod_parser::parse;
+use crate::parser::{fetch, parse};
+use std::fs;
+use surf;
 
 #[test]
 fn test_parse() {
@@ -28,6 +30,21 @@ fn test_parse() {
 
     parsed_file.sort();
     compare.sort();
-
     assert_eq!(parsed_file, compare);
+}
+
+#[async_std::test]
+async fn test_fetcher() {
+    let url = String::from("https://awesome-go.com");
+    let links = fetch(url).await;
+    assert!(links.is_ok());
+    match links {
+        Ok(resp) => {
+            for link in &resp[..10] {
+                let req = surf::get("https://".to_owned() + link.as_str()).await;
+                assert!(req.is_ok());
+            }
+        }
+        Err(error) => println!("error {:?}", error),
+    }
 }
