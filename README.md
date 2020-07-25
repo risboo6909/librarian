@@ -1,7 +1,7 @@
 # librarian
 Programming languages libraries indexer written in Rust
 
-All libraries are stored in JSON format and have following strcuture:
+All libraries are stored in JSON format and have following structure:
   
 {
 
