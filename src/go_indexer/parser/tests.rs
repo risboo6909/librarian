@@ -47,3 +47,56 @@ async fn test_fetcher() {
         Err(error) => println!("error {:?}", error),
     }
 }
+
+#[test]
+fn test_link_extractor() {
+    // º and ª symbols not work
+    let input = "github.com/bodagovsky\\
+        github.com/bodagovsky!
+        github.com/bodagovsky*
+        github.com/bodagovsky¡
+        github.com/bodagovsky@
+        github.com/bodagovsky™
+        github.com/bodagovsky#
+        github.com/bodagovsky£
+        github.com/bodagovsky$
+        github.com/bodagovsky¢
+        github.com/bodagovsky%
+        github.com/bodagovsky∞
+        github.com/bodagovsky^
+        github.com/bodagovsky§
+        github.com/bodagovsky&
+        github.com/bodagovsky¶
+        github.com/bodagovsky•
+        github.com/bodagovsky(
+        github.com/bodagovsky)
+        github.com/bodagovsky>
+        github.com/bodagovsky≥
+        github.com/bodagovsky<
+        github.com/bodagovsky≤
+        github.com/bodagovsky+
+        github.com/bodagovsky=
+        github.com/bodagovsky≠
+        github.com/bodagovsky}
+        github.com/bodagovsky‘
+        github.com/bodagovsky{
+        github.com/bodagovsky“
+        github.com/bodagovsky|
+        github.com/bodagovsky«
+        github.com/bodagovsky~
+        github.com/bodagovsky`
+        github.com/bodagovsky±
+        github.com/bodagovsky_
+        github.com/bodagovsky-
+        github.com/bodagovsky.";
+    let mut output: Vec<String> = parse(input);
+    let mut assertion_sample = vec![
+        "github.com/bodagovsky".to_owned(),
+        "github.com/bodagovsky_".to_owned(),
+        "github.com/bodagovsky-".to_owned(),
+        "github.com/bodagovsky.".to_owned(),
+    ];
+    output.sort();
+    assertion_sample.sort();
+    assert_eq!(output, assertion_sample)
+}
