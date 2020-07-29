@@ -3,7 +3,6 @@ mod tests;
 
 use regex::Regex;
 use std::collections::HashMap;
-use surf;
 
 use crate::crawler::Err;
 

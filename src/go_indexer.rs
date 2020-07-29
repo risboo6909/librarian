@@ -1,16 +1,34 @@
+use anyhow::{Error, Result};
+use chrono::Duration;
+
 mod parser;
 
-use std::error::Error;
-use anyhow::Result;
+use super::scheduler::IndexerTrait;
 
-use super::indexer::IndexerTrait;
+pub(crate) struct Indexer {
+    run_delay: Duration,
+}
 
-struct Indexer {
-
+impl Indexer {
+    pub(crate) fn new(run_delay: Duration) -> Self {
+        Indexer { run_delay }
+    }
 }
 
 impl IndexerTrait for Indexer {
-    fn update_index() -> Result<()> {
+    fn refresh_index(&mut self) -> Result<(), Error> {
         unimplemented!()
+    }
+
+    fn update_index(&mut self) -> Result<(), Error> {
+        unimplemented!()
+    }
+
+    fn get_id(&self) -> String {
+        "go_indexer".to_owned()
+    }
+
+    fn next_start_delay(&self) -> Duration {
+        self.run_delay
     }
 }

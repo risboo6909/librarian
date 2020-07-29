@@ -1,5 +1,5 @@
-use surf;
 use super::{fetch, parse};
+use surf;
 
 #[test]
 fn test_parse() {

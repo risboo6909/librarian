@@ -9,8 +9,8 @@ use log::{error, info};
 type StringPair = (String, String);
 
 pub type Err = Box<dyn std::error::Error + Send + Sync>;
-type MyErr = (String, Err);
 
+type MyErr = (String, Err);
 type MyResult = Result<Result<StringPair, MyErr>, async_std::future::TimeoutError>;
 
 pub(crate) struct Crawler {
