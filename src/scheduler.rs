@@ -73,8 +73,7 @@ impl Scheduler {
         false
     }
 
-    pub(crate) fn add_indexer(&mut self, indexer: Box<dyn IndexerTrait>) -> anyhow::Result<()> {
-
+    pub(crate) fn add_indexer(&mut self, indexer: Box<dyn IndexerTrait>) -> Result<(), Error> {
         if self.check_exists(&indexer.get_id()) {
             return Err(anyhow!(
                 "Indexer with id '{}' already exists",
@@ -99,7 +98,6 @@ impl Scheduler {
         }) = self.indexers.pop()
         {
             if next_start_ts <= Scheduler::now() {
-
                 info!("starting update for {}", indexer.get_id());
                 indexer.update_index().await?;
 
@@ -124,10 +122,8 @@ impl Scheduler {
                     sleep(StdDur::from_secs(delta as u64));
                 }
             }
-
         }
 
-        Err(anyhow!(
-                "Nothing left to execute"))
+        Err(anyhow!("Nothing left to execute"))
     }
 }

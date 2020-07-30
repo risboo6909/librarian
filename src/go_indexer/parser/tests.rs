@@ -49,7 +49,7 @@ async fn test_fetcher() {
 
 #[test]
 fn test_link_extractor() {
-    // º and ª symbols not work
+    // º and ª symbols not covered
     let input = "github.com/bodagovsky\\
         github.com/bodagovsky!
         github.com/bodagovsky*
