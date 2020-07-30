@@ -34,8 +34,7 @@ fn test_parse() {
 
 #[async_std::test]
 async fn test_fetcher() {
-    let url = String::from("https://awesome-go.com");
-    let links = fetch(url).await;
+    let links = fetch("https://awesome-go.com").await;
     assert!(links.is_ok());
     match links {
         Ok(resp) => {

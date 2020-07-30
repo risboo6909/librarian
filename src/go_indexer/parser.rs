@@ -18,7 +18,7 @@ pub(crate) fn parse(input: &str) -> Vec<String> {
     links
 }
 
-pub(crate) async fn fetch(url: String) -> Result<Vec<String>, Err> {
+pub(crate) async fn fetch(url: &str) -> Result<Vec<String>, Err> {
     let req = surf::get(url).recv_string().await?;
     let keys = parse(req.as_str());
     Ok(keys)

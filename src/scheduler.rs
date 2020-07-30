@@ -4,16 +4,17 @@ use std::thread::sleep;
 use std::time::{Duration as StdDur, SystemTime, UNIX_EPOCH};
 
 use anyhow::anyhow;
-use anyhow::{Error, Result};
 use chrono::Duration;
 use log::info;
+use async_trait::async_trait;
 
+#[async_trait]
 pub(crate) trait IndexerTrait {
     // should be called to refresh existent index
-    fn refresh_index(&mut self) -> Result<(), Error>;
+    async fn refresh_index(&mut self) -> anyhow::Result<()>;
 
     // scan to find new items for index
-    fn update_index(&mut self) -> Result<(), Error>;
+    async fn update_index(&mut self) -> anyhow::Result<()>;
 
     fn get_id(&self) -> String;
 
@@ -72,7 +73,7 @@ impl Scheduler {
         false
     }
 
-    pub(crate) fn add_indexer(&mut self, indexer: Box<dyn IndexerTrait>) -> Result<(), Error> {
+    pub(crate) fn add_indexer(&mut self, indexer: Box<dyn IndexerTrait>) -> anyhow::Result<()> {
 
         if self.check_exists(&indexer.get_id()) {
             return Err(anyhow!(
@@ -91,16 +92,16 @@ impl Scheduler {
         Ok(())
     }
 
-    pub(crate) fn run(&mut self) -> Result<(), Error> {
+    pub(crate) async fn run(&mut self) -> anyhow::Result<()> {
         while let Some(Item {
             next_start_ts,
-            indexer,
+            mut indexer,
         }) = self.indexers.pop()
         {
             if next_start_ts <= Scheduler::now() {
 
                 info!("starting update for {}", indexer.get_id());
-                //indexer.update_index()?;
+                indexer.update_index().await?;
 
                 info!("starting refresh for {}", indexer.get_id());
                 //indexer.refresh_index()?;
