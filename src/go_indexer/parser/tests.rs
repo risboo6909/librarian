@@ -105,10 +105,10 @@ fn test_link_extractor() {
 #[async_std::test]
 async fn send() {
     let lib = Document::new(1)
-        .name("librarian".to_owned())
-        .description("best lib ever".to_owned())
-        .link("http://".to_owned())
-        .target_language("All".to_owned())
+        .name("librarian")
+        .description("best lib ever")
+        .link("http://")
+        .target_language("All")
         .last_commit(
             Utc.datetime_from_str("2020-07-24 12:00:00", "%Y-%m-%d %H:%M:%S")
                 .unwrap(),
@@ -117,8 +117,8 @@ async fn send() {
             Utc.datetime_from_str("2014-07-19 12:30:00", "%Y-%m-%d %H:%M:%S")
                 .unwrap(),
         )
-        .license("MIT".to_owned())
-        .usage("web search".to_owned());
+        .license("MIT")
+        .usage("web search");
     let response =
         surf::post("http://127.0.0.1:7700/indexes/libraries/documents").body_json(&vec![lib]);
     match response {

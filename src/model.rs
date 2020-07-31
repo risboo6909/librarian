@@ -29,23 +29,23 @@ impl Document {
         }
     }
 
-    pub(crate) fn name(mut self, n: String) -> Self {
-        self.name = n;
+    pub(crate) fn name(mut self, n: &str) -> Self {
+        self.name = n.to_owned();
         self
     }
 
-    pub(crate) fn description(mut self, text: String) -> Self {
-        self.description = text;
+    pub(crate) fn description(mut self, text: &str) -> Self {
+        self.description = text.to_owned();
         self
     }
 
-    pub(crate) fn link(mut self, uri: String) -> Self {
-        self.link = uri;
+    pub(crate) fn link(mut self, uri: &str) -> Self {
+        self.link = uri.to_owned();
         self
     }
 
-    pub(crate) fn target_language(mut self, lang: String) -> Self {
-        self.target_language = lang;
+    pub(crate) fn target_language(mut self, lang: &str) -> Self {
+        self.target_language = lang.to_owned();
         self
     }
 
@@ -59,12 +59,12 @@ impl Document {
         self
     }
 
-    pub(crate) fn license(mut self, l: String) -> Self {
-        self.license = l;
+    pub(crate) fn license(mut self, l: &str) -> Self {
+        self.license = l.to_owned();
         self
     }
-    pub(crate) fn usage(mut self, u: String) -> Self {
-        self.usage = u;
+    pub(crate) fn usage(mut self, u: &str) -> Self {
+        self.usage = u.to_owned();
         self
     }
 }
