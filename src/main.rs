@@ -1,6 +1,5 @@
-use async_std::task;
-use chrono::Duration;
 use anyhow::{Error, Result};
+use async_std::task;
 use chrono::Duration;
 use log::Level;
 

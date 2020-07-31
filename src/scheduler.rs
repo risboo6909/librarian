@@ -4,9 +4,9 @@ use std::thread::sleep;
 use std::time::{Duration as StdDur, SystemTime, UNIX_EPOCH};
 
 use anyhow::anyhow;
+use async_trait::async_trait;
 use chrono::Duration;
 use log::info;
-use async_trait::async_trait;
 
 #[async_trait]
 pub(crate) trait IndexerTrait {
@@ -73,7 +73,7 @@ impl Scheduler {
         false
     }
 
-    pub(crate) fn add_indexer(&mut self, indexer: Box<dyn IndexerTrait>) -> Result<(), Error> {
+    pub(crate) fn add_indexer(&mut self, indexer: Box<dyn IndexerTrait>) -> anyhow::Result<()> {
         if self.check_exists(&indexer.get_id()) {
             return Err(anyhow!(
                 "Indexer with id '{}' already exists",

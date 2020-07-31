@@ -1,4 +1,6 @@
 use super::{fetch, parse};
+use crate::model::Document;
+use chrono::prelude::*;
 use surf;
 
 #[test]
@@ -98,4 +100,35 @@ fn test_link_extractor() {
     output.sort();
     assertion_sample.sort();
     assert_eq!(output, assertion_sample)
+}
+
+#[async_std::test]
+async fn send() {
+    let lib = Document::new(1)
+        .name("librarian".to_owned())
+        .description("best lib ever".to_owned())
+        .link("http://".to_owned())
+        .target_language("All".to_owned())
+        .last_commit(
+            Utc.datetime_from_str("2020-07-24 12:00:00", "%Y-%m-%d %H:%M:%S")
+                .unwrap(),
+        )
+        .last_release(
+            Utc.datetime_from_str("2014-07-19 12:30:00", "%Y-%m-%d %H:%M:%S")
+                .unwrap(),
+        )
+        .license("MIT".to_owned())
+        .usage("web search".to_owned());
+    let response =
+        surf::post("http://127.0.0.1:7700/indexes/libraries/documents").body_json(&vec![lib]);
+    match response {
+        Ok(req) => {
+            let r = req.await;
+            match r {
+                Ok(resp) => assert!(resp.status() == 202),
+                Err(err) => panic!("unexpected, {}", err),
+            }
+        }
+        Err(error) => panic!("error occured, {}", error),
+    }
 }

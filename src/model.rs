@@ -1,9 +1,8 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use surf;
 
 #[derive(Serialize, Deserialize)]
-pub(crate) struct Library {
+pub(crate) struct Document {
     id: u32,
     name: String,
     description: String,
@@ -15,16 +14,10 @@ pub(crate) struct Library {
     usage: String,
 }
 
-// sending vector of libraries to meilisearch server
-// fn send(lib: Library) -> Result<()> {
-//     let request = surf::get("127.0.0.1:7700").recv_string()?;
-//     Ok()
-// }
-
-impl Library {
-    fn new() -> Self {
-        Library {
-            id: 0,
+impl Document {
+    pub(crate) fn new(id: u32) -> Self {
+        Document {
+            id,
             name: "".to_owned(),
             description: "".to_owned(),
             link: "".to_owned(),
@@ -34,5 +27,44 @@ impl Library {
             license: "".to_owned(),
             usage: "".to_owned(),
         }
+    }
+
+    pub(crate) fn name(mut self, n: String) -> Self {
+        self.name = n;
+        self
+    }
+
+    pub(crate) fn description(mut self, text: String) -> Self {
+        self.description = text;
+        self
+    }
+
+    pub(crate) fn link(mut self, uri: String) -> Self {
+        self.link = uri;
+        self
+    }
+
+    pub(crate) fn target_language(mut self, lang: String) -> Self {
+        self.target_language = lang;
+        self
+    }
+
+    pub(crate) fn last_commit(mut self, date: DateTime<Utc>) -> Self {
+        self.last_commit = Some(date);
+        self
+    }
+
+    pub(crate) fn last_release(mut self, date: DateTime<Utc>) -> Self {
+        self.last_release = Some(date);
+        self
+    }
+
+    pub(crate) fn license(mut self, l: String) -> Self {
+        self.license = l;
+        self
+    }
+    pub(crate) fn usage(mut self, u: String) -> Self {
+        self.usage = u;
+        self
     }
 }

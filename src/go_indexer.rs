@@ -1,12 +1,12 @@
-use chrono::Duration;
 use async_trait::async_trait;
+use chrono::Duration;
 
 mod parser;
 
-use super::scheduler::IndexerTrait;
 use super::crawler::Crawler;
-use parser::{parse, fetch};
+use super::scheduler::IndexerTrait;
 use anyhow::bail;
+use parser::{fetch, parse};
 
 pub(crate) struct Indexer {
     run_delay: Duration,
