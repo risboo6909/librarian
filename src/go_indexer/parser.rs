@@ -2,24 +2,31 @@
 mod tests;
 
 use regex::Regex;
-use std::collections::HashMap;
+use std::collections::HashSet;
+
+use anyhow::anyhow;
+use http::Uri;
 
 use crate::crawler::Err;
 
 /// Parses go.mod file fetching github/gitlab unique link
 /// and returning a vector of parsed links as strings
-pub(crate) fn parse(input: &str) -> Vec<String> {
-    let mut link_map: HashMap<String, usize> = HashMap::new();
+pub(crate) fn parse(input: &str) -> Vec<Uri> {
+    let mut parsed: HashSet<String> = HashSet::new();
     let re = Regex::new(r"(github|gitlab)\.(com|ru)[\w\d/\-\.]*").unwrap();
     for link in re.captures_iter(input) {
-        link_map.insert((&link[0]).to_string(), 0);
+        parsed.insert((&link[0]).to_string());
     }
-    let links: Vec<String> = link_map.keys().map(|x| x.to_owned()).collect();
-    links
+    // assume all links are HTTPS ones
+    parsed.iter().filter_map(|uri|
+        // ignore invalid uris
+        format!("https://{}", uri).parse::<Uri>().ok()
+    ).collect()
 }
 
-pub(crate) async fn fetch(url: &str) -> Result<Vec<String>, Err> {
-    let req = surf::get(url).recv_string().await?;
-    let keys = parse(req.as_str());
-    Ok(keys)
+pub(crate) async fn fetch(url: &str) -> anyhow::Result<Vec<Uri>> {
+    match surf::get(url).recv_string().await {
+        Ok(res) => Ok(parse(res.as_str())),
+        Err(_) => Err(anyhow!("error fetching url: '{}'", url)),
+    }
 }

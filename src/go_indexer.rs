@@ -28,12 +28,7 @@ impl IndexerTrait for Indexer {
         // first, fetch awesome go page
 
         // cant use ? here, due to https://github.com/dtolnay/anyhow/issues/35
-        let parsed = match fetch("https://awesome-go.com").await {
-            Ok(parsed) => parsed,
-            // TODO: make better error
-            Err(err) => bail!(err),
-        };
-
+        let parsed = fetch("https://awesome-go.com").await?;
         println!("{:?}", parsed);
         //let mut crawler = Crawler::new()
         Ok(())

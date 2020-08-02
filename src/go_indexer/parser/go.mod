@@ -10,6 +10,7 @@ require (
 	github.com/lib/pq v1.3.0 // indirect
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/pflag v1.0.5
+    dsfjadsifjadsi   // this strange url will be ignored by http::Uri validator
 	github.com/spf13/viper v1.6.1
 	github.com/stretchr/testify v1.4.0
 	github.com/utrack/clay/v2 v2.4.7
