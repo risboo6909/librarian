@@ -6,7 +6,7 @@ use std::time::{Duration as StdDur, SystemTime, UNIX_EPOCH};
 use anyhow::anyhow;
 use async_trait::async_trait;
 use chrono::Duration;
-use log::info;
+use log::{error, info};
 
 #[async_trait]
 pub(crate) trait IndexerTrait {
@@ -99,7 +99,10 @@ impl Scheduler {
         {
             if next_start_ts <= Scheduler::now() {
                 info!("starting update for {}", indexer.get_id());
-                indexer.update_index().await?;
+                match indexer.update_index().await {
+                    Ok(_) => (),
+                    Err(err) => error!("{}", err),
+                };
 
                 info!("starting refresh for {}", indexer.get_id());
                 //indexer.refresh_index()?;

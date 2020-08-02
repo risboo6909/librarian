@@ -41,7 +41,7 @@ async fn test_fetcher() {
     match links {
         Ok(resp) => {
             for link in &resp[..10] {
-                let req = surf::get("https://".to_owned() + link.as_str()).await;
+                let req = surf::get(format!("https://{}", link.as_str())).await;
                 assert!(req.is_ok());
             }
         }
