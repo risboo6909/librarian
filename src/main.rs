@@ -6,8 +6,8 @@ use log::Level;
 mod crawler;
 mod go_indexer;
 mod model;
-mod scheduler;
 mod save;
+mod scheduler;
 
 use scheduler::Scheduler;
 
