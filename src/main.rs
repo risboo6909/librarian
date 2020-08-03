@@ -7,6 +7,7 @@ mod crawler;
 mod go_indexer;
 mod model;
 mod scheduler;
+mod save;
 
 use scheduler::Scheduler;
 
