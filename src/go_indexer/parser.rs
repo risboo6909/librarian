@@ -18,10 +18,12 @@ pub(crate) fn parse(input: &str) -> Vec<Uri> {
         parsed.insert((&link[0]).to_string());
     }
     // assume all links are HTTPS ones
-    parsed.iter().filter_map(|uri|
+    parsed
+        .iter()
+        .filter_map(|uri|
         // ignore invalid uris
-        format!("https://{}", uri).parse::<Uri>().ok()
-    ).collect()
+        format!("https://{}", uri).parse::<Uri>().ok())
+        .collect()
 }
 
 pub(crate) async fn fetch(url: &str) -> anyhow::Result<Vec<Uri>> {
