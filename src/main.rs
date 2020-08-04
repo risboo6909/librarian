@@ -3,10 +3,10 @@ use async_std::task;
 use chrono::Duration;
 use log::Level;
 
+mod accountant;
 mod crawler;
 mod go_indexer;
 mod model;
-mod save;
 mod scheduler;
 
 use scheduler::Scheduler;
