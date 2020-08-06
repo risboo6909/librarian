@@ -5,6 +5,7 @@ use std::{cmp::min, pin::Pin};
 use futures::stream::FuturesUnordered;
 use futures::{stream, Future, FutureExt, StreamExt};
 use log::{error, info};
+use http::Uri;
 
 type StringPair = (String, String);
 
@@ -18,15 +19,15 @@ pub(crate) struct Crawler {
     request_timeout: Duration,
     uris: VecDeque<String>,
 
-    strm: FuturesUnordered<Pin<Box<dyn Future<Output = MyResult>>>>,
+    strm: FuturesUnordered<Pin<Box<dyn Future<Output = MyResult> + Send>>>,
 }
 
 impl Crawler {
-    pub(crate) fn new(uris: &[&str], max_clients: usize, request_timeout: u64) -> Self {
+    pub(crate) fn new(uris: &[Uri], max_clients: usize, request_timeout: Duration) -> Self {
         Crawler {
             max_clients,
-            request_timeout: Duration::from_secs(request_timeout),
-            uris: uris.iter().map(|s| String::from(*s)).collect(),
+            request_timeout,
+            uris: uris.iter().map(|uri| uri.to_string()).collect(),
 
             strm: stream::FuturesUnordered::new(),
         }
@@ -41,7 +42,7 @@ impl Crawler {
 
         self.strm.push(
             async_std::future::timeout(self.request_timeout, async {
-                let client = surf::get(uri.clone());
+                let client = surf::get(uri.to_string());
                 match client.recv_string().await {
                     Ok(body) => Ok((uri, body)),
                     Err(err) => Err((uri, err)),
@@ -82,6 +83,8 @@ impl Crawler {
 mod tests {
     use super::Crawler;
     use log::Level;
+    use http::Uri;
+    use std::time::Duration;
 
     #[async_std::test]
     async fn test_fetch() {
@@ -89,13 +92,13 @@ mod tests {
 
         let crawler = Crawler::new(
             &[
-                "https://www.google.com",
-                "https://dsfs",
-                "https://yahoo.com",
-                "https://reddit.com",
+                "https://www.google.com".parse::<Uri>().unwrap(),
+                "https://dsfs".parse::<Uri>().unwrap(),
+                "https://yahoo.com".parse::<Uri>().unwrap(),
+                "https://reddit.com".parse::<Uri>().unwrap(),
             ],
             2,
-            5,
+            Duration::from_secs(5),
         );
 
         let res = crawler.crawl().await;
@@ -104,11 +107,11 @@ mod tests {
         assert_eq!(res.len(), 4);
 
         // hope this websites will work most of the time :)
-        assert!(res["https://www.google.com"].is_ok());
-        assert!(res["https://yahoo.com"].is_ok());
-        assert!(res["https://reddit.com"].is_ok());
+        assert!(res["https://www.google.com/"].is_ok());
+        assert!(res["https://yahoo.com/"].is_ok());
+        assert!(res["https://reddit.com/"].is_ok());
 
         // ...and this one should fail
-        assert!(res["https://dsfs"].is_err());
+        assert!(res["https://dsfs/"].is_err());
     }
 }

@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use chrono::Duration;
+use std::time::Duration as StdDur;
 
 mod parser;
 
@@ -20,17 +21,24 @@ impl Indexer {
 
 #[async_trait]
 impl IndexerTrait for Indexer {
+
     async fn refresh_index(&mut self) -> anyhow::Result<()> {
         unimplemented!()
     }
 
     async fn update_index(&mut self) -> anyhow::Result<()> {
         // first, fetch awesome go page
-
-        // cant use ? here, due to https://github.com/dtolnay/anyhow/issues/35
         let parsed = fetch("https://awesome-go.com").await?;
-        println!("{:?}", parsed);
-        //let mut crawler = Crawler::new()
+
+        // second, crawl urls
+        let crawler = Crawler::new(
+            &parsed,
+            5,
+            StdDur::from_secs(5)
+        );
+
+        crawler.crawl().await;
+
         Ok(())
     }
 
@@ -41,4 +49,5 @@ impl IndexerTrait for Indexer {
     fn next_start_delay(&self) -> Duration {
         self.run_delay
     }
+
 }
