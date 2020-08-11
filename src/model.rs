@@ -1,15 +1,14 @@
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub(crate) struct Document {
     id: u32,
     name: String,
     description: String,
     link: String,
     target_language: String,
-    last_commit: Option<DateTime<Utc>>,
-    last_release: Option<DateTime<Utc>>,
+    last_commit: i64,
+    last_release: i64,
     license: String,
     usage: String,
 }
@@ -22,8 +21,8 @@ impl Document {
             description: "".to_owned(),
             link: "".to_owned(),
             target_language: "".to_owned(),
-            last_commit: None,
-            last_release: None,
+            last_commit: 0,
+            last_release: 0,
             license: "".to_owned(),
             usage: "".to_owned(),
         }
@@ -49,13 +48,13 @@ impl Document {
         self
     }
 
-    pub(crate) fn last_commit(mut self, date: DateTime<Utc>) -> Self {
-        self.last_commit = Some(date);
+    pub(crate) fn last_commit(mut self, date: i64) -> Self {
+        self.last_commit = date;
         self
     }
 
-    pub(crate) fn last_release(mut self, date: DateTime<Utc>) -> Self {
-        self.last_release = Some(date);
+    pub(crate) fn last_release(mut self, date: i64) -> Self {
+        self.last_release = date;
         self
     }
 

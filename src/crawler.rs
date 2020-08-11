@@ -4,8 +4,8 @@ use std::{cmp::min, pin::Pin};
 
 use futures::stream::FuturesUnordered;
 use futures::{stream, Future, FutureExt, StreamExt};
-use log::{error, info};
 use http::Uri;
+use log::{error, info};
 
 type StringPair = (String, String);
 
@@ -82,8 +82,8 @@ impl Crawler {
 #[cfg(test)]
 mod tests {
     use super::Crawler;
-    use log::Level;
     use http::Uri;
+    use log::Level;
     use std::time::Duration;
 
     #[async_std::test]

@@ -1,4 +1,6 @@
 use super::{fetch, parse};
+use crate::accountant;
+use crate::crawler::Err;
 use crate::model::Document;
 
 use std::collections::HashSet;
@@ -57,11 +59,13 @@ async fn send() {
         .target_language("All")
         .last_commit(
             Utc.datetime_from_str("2020-07-24 12:00:00", "%Y-%m-%d %H:%M:%S")
-                .unwrap(),
+                .unwrap()
+                .timestamp(),
         )
         .last_release(
             Utc.datetime_from_str("2014-07-19 12:30:00", "%Y-%m-%d %H:%M:%S")
-                .unwrap(),
+                .unwrap()
+                .timestamp(),
         )
         .license("MIT")
         .usage("web search");
@@ -133,4 +137,15 @@ fn test_link_extractor() {
     .collect();
 
     assert_eq!(output, assertion_sample)
+}
+
+#[async_std::test]
+#[ignore]
+async fn test_search() {
+    let acc = accountant::Accountant::new();
+    let req = accountant::SearchRequest::new("web")
+        .filter_by("license = 'APACHE 2.0'")
+        .set_limit(1);
+    let response = acc.search(req).await.unwrap();
+    println!("{:?}", response)
 }

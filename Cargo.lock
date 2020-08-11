@@ -593,6 +593,7 @@ dependencies = [
  "log",
  "regex",
  "serde",
+ "serde_json",
  "simple_logger",
  "surf",
  "url",

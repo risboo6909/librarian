@@ -21,7 +21,6 @@ impl Indexer {
 
 #[async_trait]
 impl IndexerTrait for Indexer {
-
     async fn refresh_index(&mut self) -> anyhow::Result<()> {
         unimplemented!()
     }
@@ -31,11 +30,7 @@ impl IndexerTrait for Indexer {
         let parsed = fetch("https://awesome-go.com").await?;
 
         // second, crawl urls
-        let crawler = Crawler::new(
-            &parsed,
-            5,
-            StdDur::from_secs(5)
-        );
+        let crawler = Crawler::new(&parsed, 5, StdDur::from_secs(5));
 
         crawler.crawl().await;
 
@@ -49,5 +44,4 @@ impl IndexerTrait for Indexer {
     fn next_start_delay(&self) -> Duration {
         self.run_delay
     }
-
 }
