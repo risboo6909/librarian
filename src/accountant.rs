@@ -1,6 +1,7 @@
 use crate::crawler::Err;
 use crate::model::Document;
 use serde::{Deserialize, Serialize};
+use serde_json;
 use surf;
 
 //Meilisearch api for testing
@@ -18,6 +19,10 @@ pub(crate) struct SearchRequest<'a> {
     offset: Option<u32>,
     limit: Option<u32>,
 }
+#[derive(Deserialize, Serialize)]
+pub(crate) struct SearchResponse {
+    hits: Vec<Document>,
+}
 
 //Accountant works with documents
 pub(crate) struct Accountant {
@@ -30,16 +35,17 @@ impl Accountant {
         Accountant {}
     }
 
-    pub(crate) async fn search(q: &str) -> Result<Vec<Document>, Err> {
-        let docs: Vec<Document> = vec![];
-        let req = SearchRequest::new(q);
+    pub(crate) async fn search(self, req: SearchRequest<'_>) -> Result<Vec<Document>, Err> {
         let mut response = surf::post(format!("{}/indexes/libraries/search", URL))
             .body_json(&req)?
+            .await?
+            .body_string()
             .await?;
-        Ok(docs)
+        let SearchResponse { hits } = serde_json::from_str(response.as_str())?;
+        Ok(hits)
     }
 
-    pub(crate) async fn send(docs: &Vec<Document>) -> Result<String, Err> {
+    pub(crate) async fn send(self, docs: &Vec<Document>) -> Result<String, Err> {
         let mut response = surf::post(format!("{}/indexes/libraries/documents", URL))
             .body_json(docs)?
             .await?;
@@ -68,5 +74,11 @@ impl<'a> SearchRequest<'a> {
     pub(crate) fn set_offset(mut self, offfset: u32) -> Self {
         self.offset = Some(offfset);
         self
+    }
+}
+
+impl SearchResponse {
+    fn new() -> Self {
+        SearchResponse { hits: vec![] }
     }
 }

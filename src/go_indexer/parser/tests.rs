@@ -146,13 +146,6 @@ async fn test_search() {
     let req = accountant::SearchRequest::new("web")
         .filter_by("license = 'APACHE 2.0'")
         .set_limit(1);
-    let response = surf::post(format!("{}/indexes/libraries/search", accountant::URL))
-        .body_json(&req)
-        .unwrap()
-        .await
-        .unwrap()
-        .body_string()
-        .await
-        .unwrap();
-    println!("{}", response)
+    let response = acc.search(req).await.unwrap();
+    println!("{:?}", response)
 }
