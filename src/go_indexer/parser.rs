@@ -19,25 +19,23 @@ use crate::crawler::Err;
 /// link from "releases_url" - to fetch releases data
 /// https://raw.githubusercontent.com/risboo6909/when/master/README.md - to download raw README.md
 /// or any other file
-#[allow(clippy::mutable_key_type)]
-fn prepare_github_links(uri: Uri) -> HashSet<Uri> {
+
+fn prepare_github_links(uri: Uri) -> Vec<Uri> {
     // TODO: implement
     // println!("{:?}", uri.path());
-    HashSet::from_iter(vec![uri])
+    vec![uri]
 }
 
-#[allow(clippy::mutable_key_type)]
-fn prepare_gitlab_links(uri: Uri) -> HashSet<Uri> {
+fn prepare_gitlab_links(uri: Uri) -> Vec<Uri> {
     // TODO: implement
-    HashSet::from_iter(vec![uri])
+    vec![uri]
 }
 
 /// Parse library uri and return a set of api handlers to call later from crawler for each uri
-#[allow(clippy::mutable_key_type)]
-pub(crate) fn parse(input: &str) -> HashMap<String, HashSet<Uri>> {
+pub(crate) fn parse(input: &str) -> HashMap<String, Vec<Uri>> {
 
     // id -> {set of uris}
-    let mut parsed: HashMap<String, HashSet<Uri>> = HashMap::new();
+    let mut parsed: HashMap<String, Vec<Uri>> = HashMap::new();
 
     let re = Regex::new(r"(github|gitlab)\.(com|ru)[\w\d/\-\.]*").unwrap();
 
@@ -68,7 +66,7 @@ pub(crate) fn parse(input: &str) -> HashMap<String, HashSet<Uri>> {
 
 }
 
-pub(crate) async fn fetch(url: &str) -> anyhow::Result<HashMap<String, HashSet<Uri>>> {
+pub(crate) async fn fetch(url: &str) -> anyhow::Result<HashMap<String, Vec<Uri>>> {
     match surf::get(url).recv_string().await {
         Ok(res) => Ok(parse(res.as_str())),
         Err(_) => Err(anyhow!("error fetching url: '{}'", url)),

@@ -15,29 +15,29 @@ use surf;
 fn test_parse() {
     let contents = include_str!("go.mod");
 
-    let parsed: HashMap<String, HashSet<Uri>> = parse(contents);
+    let parsed: HashMap<String, Vec<Uri>> = parse(contents);
 
     let mut expected = HashMap::new();
 
     expected.insert(
         String::from("github.com/360EntSecGroup-Skylar/excelize"),
-        HashSet::from_iter(vec!["https://github.com/360EntSecGroup-Skylar/excelize"
+        vec!["https://github.com/360EntSecGroup-Skylar/excelize"
             .parse::<Uri>()
-            .unwrap()]),
+            .unwrap()],
     );
 
     expected.insert(
         String::from("github.com/spf13/pflag"),
-        HashSet::from_iter(vec!["https://github.com/spf13/pflag"
+        vec!["https://github.com/spf13/pflag"
             .parse::<Uri>()
-            .unwrap()]),
+            .unwrap()],
     );
 
     expected.insert(
         String::from("github.com/go-chi/chi"),
-        HashSet::from_iter(vec!["https://github.com/go-chi/chi"
+        vec!["https://github.com/go-chi/chi"
             .parse::<Uri>()
-            .unwrap()]),
+            .unwrap()]
     );
 
     assert_eq!(expected, parsed);

@@ -32,11 +32,12 @@ pub(crate) struct Crawler {
 
 impl Crawler {
     pub(crate) fn new(
-        uris: HashMap<String, HashSet<Uri>>,
+        uris: HashMap<String, Vec<Uri>>,
         max_clients: usize,
         request_timeout: Duration,
     ) -> Self {
-        let mut converted: Vec<IdUri> = vec![];
+
+        let mut converted = vec![];
 
         // convert to Vec<(group_name, handler)> form
         for (uri, handlers) in uris {
@@ -124,19 +125,19 @@ mod tests {
 
         input.insert(
             String::from("google.com"),
-            HashSet::from_iter(vec!["https://www.google.com".parse::<Uri>().unwrap()]),
+            vec!["https://www.google.com".parse::<Uri>().unwrap()],
         );
         input.insert(
             String::from("sdfdf"),
-            HashSet::from_iter(vec!["https://sdfdf".parse::<Uri>().unwrap()]),
+            vec!["https://sdfdf".parse::<Uri>().unwrap()],
         );
         input.insert(
             String::from("yahoo.com"),
-            HashSet::from_iter(vec!["https://www.yahoo.com".parse::<Uri>().unwrap()]),
+            vec!["https://www.yahoo.com".parse::<Uri>().unwrap()],
         );
         input.insert(
             String::from("reddit.com"),
-            HashSet::from_iter(vec!["https://www.reddit.com".parse::<Uri>().unwrap()]),
+            vec!["https://www.reddit.com".parse::<Uri>().unwrap()],
         );
 
         let crawler = Crawler::new(input, 2, Duration::from_secs(5));
