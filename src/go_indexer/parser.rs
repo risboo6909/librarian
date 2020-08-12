@@ -19,19 +19,23 @@ use crate::crawler::Err;
 /// link from "releases_url" - to fetch releases data
 /// https://raw.githubusercontent.com/risboo6909/when/master/README.md - to download raw README.md
 /// or any other file
+#[allow(clippy::mutable_key_type)]
 fn prepare_github_links(uri: Uri) -> HashSet<Uri> {
     // TODO: implement
     // println!("{:?}", uri.path());
     HashSet::from_iter(vec![uri])
 }
 
+#[allow(clippy::mutable_key_type)]
 fn prepare_gitlab_links(uri: Uri) -> HashSet<Uri> {
     // TODO: implement
     HashSet::from_iter(vec![uri])
 }
 
 /// Parse library uri and return a set of api handlers to call later from crawler for each uri
+#[allow(clippy::mutable_key_type)]
 pub(crate) fn parse(input: &str) -> HashMap<String, HashSet<Uri>> {
+
     // id -> {set of uris}
     let mut parsed: HashMap<String, HashSet<Uri>> = HashMap::new();
 

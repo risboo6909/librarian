@@ -2,13 +2,12 @@ use crate::crawler::Err;
 use crate::model::Document;
 use serde::{Deserialize, Serialize};
 use serde_json;
-use surf;
 
-//Meilisearch api for testing
-pub(crate) const URL: &'static str = "http://127.0.0.1:7700";
+// Meilisearch api for testing
+pub(crate) const URL: &str = "http://127.0.0.1:7700";
 
 #[derive(Deserialize, Serialize)]
-//SearchRequest holds parameters for searching
+// SearchRequest holds parameters for searching
 // q - mandatory, others - optional
 // filters attribute can hold many fileds and many conditions to filter at once, for example:
 //          "filters": "release_date > 1590537600" 05/27/2020 @ 12:00am (UTC)
@@ -36,7 +35,7 @@ impl Accountant {
     }
 
     pub(crate) async fn search(self, req: SearchRequest<'_>) -> Result<Vec<Document>, Err> {
-        let mut response = surf::post(format!("{}/indexes/libraries/search", URL))
+        let response = surf::post(format!("{}/indexes/libraries/search", URL))
             .body_json(&req)?
             .await?
             .body_string()
