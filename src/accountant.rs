@@ -33,7 +33,18 @@ impl Accountant {
     pub(crate) fn new() -> Self {
         Accountant {}
     }
-
+    //To trigger search you need to construct a search request
+    //It is made by creating new SearchRequest object:
+    // let request =  SearchRequest::new("graphics");
+    //As query string for search is mandatory, you have to provide it while creating request
+    //Then, you can add filters for search result. Filters are optional.
+    //It can be done like this:
+    //let request =  SearchRequest::new("graphics").filter_by("target_language = Rust");
+    //You can filter any document filed you want as well as any logic is accepted:
+    //let request =  SearchRequest::new("graphics").filter_by("release_date > 3125890 OR usage = 'modeling'");
+    //let request =  SearchRequest::new("graphics").filter_by("target_language = 'All' AND usage = 'AI'");
+    //You can also set an offset with SearchRequest::new("graphics").set_offset(10) to tell the engine how many documents to skip
+    // or set limit by SearchRequest::new("graphics").set_limit(100) to set a constraint for the quantity of documents listed
     pub(crate) async fn search(self, req: SearchRequest<'_>) -> Result<Vec<Document>, Err> {
         let response = surf::post(format!("{}/indexes/libraries/search", URL))
             .body_json(&req)?
