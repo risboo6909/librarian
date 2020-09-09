@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet, VecDeque};
+use std::collections::{HashMap, VecDeque};
 use std::time::Duration;
 use std::{cmp::min, pin::Pin};
 
@@ -22,6 +22,9 @@ type ResultErr = (IdUri, Err);
 
 type MyResult = Result<Result<ResultOk, ResultErr>, async_std::future::TimeoutError>;
 
+type RepoUri = String;
+type HandlerUri = String;
+
 pub(crate) struct Crawler {
     max_clients: usize,
     request_timeout: Duration,
@@ -31,12 +34,12 @@ pub(crate) struct Crawler {
 }
 
 impl Crawler {
+  
     pub(crate) fn new(
         uris: HashMap<String, Vec<Uri>>,
         max_clients: usize,
         request_timeout: Duration,
     ) -> Self {
-
         let mut converted = vec![];
 
         // convert to Vec<(group_name, handler)> form
@@ -76,8 +79,9 @@ impl Crawler {
         );
     }
 
+
     // fetches given urls asynchronously consuming self
-    pub(crate) async fn crawl(mut self) -> HashMap<String, HashMap<String, Result<String, Err>>> {
+    pub(crate) async fn crawl(mut self) -> HashMap<RepoUri, HashMap<HandlerUri, Result<String, Err>>> {
         let mut res = HashMap::new();
 
         // create initial clients
@@ -87,6 +91,7 @@ impl Crawler {
 
         // process downloads
         while let Some(result) = self.strm.next().await {
+
             match result.unwrap() {
                 Ok(((id, uri), body)) => {
                     info!("{} fetched successfully", uri);
@@ -94,12 +99,14 @@ impl Crawler {
                         .or_insert_with(HashMap::new)
                         .insert(uri, Ok(body));
                 }
+
                 Err(((id, uri), err)) => {
                     error!("error fetching uri: {}, reason: {}", uri, err);
                     res.entry(id)
                         .or_insert_with(HashMap::new)
                         .insert(uri, Err(err));
                 }
+
             };
 
             self.enqueue_job();
@@ -110,6 +117,7 @@ impl Crawler {
 
 #[cfg(test)]
 mod tests {
+
     use super::Crawler;
     use http::Uri;
     use log::Level;

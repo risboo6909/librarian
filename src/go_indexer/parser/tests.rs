@@ -28,16 +28,12 @@ fn test_parse() {
 
     expected.insert(
         String::from("github.com/spf13/pflag"),
-        vec!["https://github.com/spf13/pflag"
-            .parse::<Uri>()
-            .unwrap()],
+        vec!["https://github.com/spf13/pflag".parse::<Uri>().unwrap()],
     );
 
     expected.insert(
         String::from("github.com/go-chi/chi"),
-        vec!["https://github.com/go-chi/chi"
-            .parse::<Uri>()
-            .unwrap()]
+        vec!["https://github.com/go-chi/chi".parse::<Uri>().unwrap()],
     );
 
     assert_eq!(expected, parsed);

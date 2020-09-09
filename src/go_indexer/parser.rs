@@ -2,13 +2,11 @@
 mod tests;
 
 use regex::Regex;
-use std::collections::{HashMap, HashSet};
-use std::iter::FromIterator;
+use std::collections::HashMap;
 
 use anyhow::anyhow;
 use http::Uri;
 
-use crate::crawler::Err;
 
 /// Github API:
 ///
@@ -21,9 +19,15 @@ use crate::crawler::Err;
 /// or any other file
 
 fn prepare_github_links(uri: Uri) -> Vec<Uri> {
-    // TODO: implement
-    // println!("{:?}", uri.path());
-    vec![uri]
+    let uri_path = &uri.path()[1..];
+    vec![
+      format!("https://api.github.com/repos/{path}/", 
+        path=uri_path,
+        ).parse::<Uri>().unwrap(),
+      format!("https://raw.githubusercontent.com/{path}/master/README.md",
+        path=uri_path,
+        ).parse::<Uri>().unwrap(),
+    ]
 }
 
 fn prepare_gitlab_links(uri: Uri) -> Vec<Uri> {
@@ -33,14 +37,12 @@ fn prepare_gitlab_links(uri: Uri) -> Vec<Uri> {
 
 /// Parse library uri and return a set of api handlers to call later from crawler for each uri
 pub(crate) fn parse(input: &str) -> HashMap<String, Vec<Uri>> {
-
-    // id -> {set of uris}
+    // id -> Vec<uri> 
     let mut parsed: HashMap<String, Vec<Uri>> = HashMap::new();
 
     let re = Regex::new(r"(github|gitlab)\.(com|ru)[\w\d/\-\.]*").unwrap();
 
     for link in re.captures_iter(input) {
-
         // assume all links are HTTPS ones
         let uri = match format!("https://{}", &link[0]).parse::<Uri>() {
             Ok(s) => s,
@@ -59,11 +61,9 @@ pub(crate) fn parse(input: &str) -> HashMap<String, Vec<Uri>> {
             }
             _ => continue,
         };
-
     }
 
     parsed
-
 }
 
 pub(crate) async fn fetch(url: &str) -> anyhow::Result<HashMap<String, Vec<Uri>>> {

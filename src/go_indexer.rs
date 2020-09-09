@@ -6,8 +6,7 @@ mod parser;
 
 use super::crawler::Crawler;
 use super::scheduler::IndexerTrait;
-use anyhow::bail;
-use parser::{fetch, parse};
+use parser::fetch;
 
 pub(crate) struct Indexer {
     run_delay: Duration,
@@ -26,18 +25,14 @@ impl IndexerTrait for Indexer {
     }
 
     async fn update_index(&mut self) -> anyhow::Result<()> {
-
+      
         // first, fetch awesome go page
         let parsed = fetch("https://awesome-go.com").await?;
 
         println!("{:?}", parsed);
 
         // second, crawl urls
-        let crawler = Crawler::new(
-            parsed,
-            10,
-            StdDur::from_secs(5)
-        );
+        let crawler = Crawler::new(parsed, 10, StdDur::from_secs(5));
 
         crawler.crawl().await;
 
