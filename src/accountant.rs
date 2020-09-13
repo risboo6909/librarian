@@ -24,15 +24,21 @@ pub(crate) struct SearchResponse {
     hits: Vec<Document>,
 }
 
-//Accountant works with documents
+// Accountant works with documents
 pub(crate) struct Accountant {
-    /*
-Useful parameters for sending/searching documents to meilisearch will be stored here
-*/}
+    // Useful parameters for sending/searching documents to meilisearch will be stored here
+    meili_url: String,
+}
 
 impl Accountant {
     pub(crate) fn new() -> Self {
-        Accountant {}
+        Accountant {
+            meili_url: format!(
+                "{}:{}",
+                super::CONF.read().unwrap().get_str("meili_host").unwrap(),
+                super::CONF.read().unwrap().get_int("meili_port").unwrap(),
+            ),
+        }
     }
 
     // To trigger search you need to construct a search request

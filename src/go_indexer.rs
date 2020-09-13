@@ -5,6 +5,7 @@ use std::time::Duration as StdDur;
 mod parser;
 
 use super::crawler::Crawler;
+use super::post_proc::post_proc;
 use super::scheduler::IndexerTrait;
 use parser::fetch;
 
@@ -25,16 +26,16 @@ impl IndexerTrait for Indexer {
     }
 
     async fn update_index(&mut self) -> anyhow::Result<()> {
-      
         // first, fetch awesome go page
         let parsed = fetch("https://awesome-go.com").await?;
 
-        println!("{:?}", parsed);
+        // println!("{:?}", parsed);
 
         // second, crawl urls
-        let crawler = Crawler::new(parsed, 10, StdDur::from_secs(5));
+        let mut crawler = Crawler::new(parsed, 10, StdDur::from_secs(5));
+        crawler.set_post_proc(post_proc);
 
-        crawler.crawl().await;
+        let results = crawler.crawl().await;
 
         Ok(())
     }

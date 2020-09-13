@@ -29,12 +29,11 @@ pub(crate) struct Crawler {
     max_clients: usize,
     request_timeout: Duration,
     ids_uris: VecDeque<IdUri>,
-
+    post_proc: Option<fn(&str, &str) -> String>,
     strm: FuturesUnordered<Pin<Box<dyn Future<Output = MyResult> + Send>>>,
 }
 
 impl Crawler {
-  
     pub(crate) fn new(
         uris: HashMap<String, Vec<Uri>>,
         max_clients: usize,
@@ -53,9 +52,14 @@ impl Crawler {
             max_clients,
             request_timeout,
             ids_uris: VecDeque::from(converted),
-
+            post_proc: None,
             strm: stream::FuturesUnordered::new(),
         }
+    }
+
+    pub(crate) fn set_post_proc(&mut self, f: fn(&str, &str) -> String) -> &mut Self {
+        self.post_proc = Some(f);
+        self
     }
 
     pub(crate) fn enqueue_job(&mut self) {
@@ -79,9 +83,10 @@ impl Crawler {
         );
     }
 
-
     // fetches given urls asynchronously consuming self
-    pub(crate) async fn crawl(mut self) -> HashMap<RepoUri, HashMap<HandlerUri, Result<String, Err>>> {
+    pub(crate) async fn crawl(
+        mut self,
+    ) -> HashMap<RepoUri, HashMap<HandlerUri, Result<String, Err>>> {
         let mut res = HashMap::new();
 
         // create initial clients
@@ -91,10 +96,14 @@ impl Crawler {
 
         // process downloads
         while let Some(result) = self.strm.next().await {
-
             match result.unwrap() {
-                Ok(((id, uri), body)) => {
+                Ok(((id, uri), mut body)) => {
                     info!("{} fetched successfully", uri);
+
+                    if let Some(f) = self.post_proc {
+                        body = f(&uri, &body);
+                    }
+
                     res.entry(id)
                         .or_insert_with(HashMap::new)
                         .insert(uri, Ok(body));
@@ -106,7 +115,6 @@ impl Crawler {
                         .or_insert_with(HashMap::new)
                         .insert(uri, Err(err));
                 }
-
             };
 
             self.enqueue_job();
@@ -117,7 +125,6 @@ impl Crawler {
 
 #[cfg(test)]
 mod tests {
-
     use super::Crawler;
     use http::Uri;
     use log::Level;

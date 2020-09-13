@@ -7,7 +7,6 @@ use std::collections::HashMap;
 use anyhow::anyhow;
 use http::Uri;
 
-
 /// Github API:
 ///
 /// First, call https://api.github.com/repos/risboo6909/when to get a list of handlers,
@@ -21,12 +20,15 @@ use http::Uri;
 fn prepare_github_links(uri: Uri) -> Vec<Uri> {
     let uri_path = &uri.path()[1..];
     vec![
-      format!("https://api.github.com/repos/{path}/", 
-        path=uri_path,
-        ).parse::<Uri>().unwrap(),
-      format!("https://raw.githubusercontent.com/{path}/master/README.md",
-        path=uri_path,
-        ).parse::<Uri>().unwrap(),
+        format!("https://api.github.com/repos/{path}/", path = uri_path,)
+            .parse::<Uri>()
+            .unwrap(),
+        format!(
+            "https://raw.githubusercontent.com/{path}/master/README.md",
+            path = uri_path,
+        )
+        .parse::<Uri>()
+        .unwrap(),
     ]
 }
 
@@ -37,7 +39,7 @@ fn prepare_gitlab_links(uri: Uri) -> Vec<Uri> {
 
 /// Parse library uri and return a set of api handlers to call later from crawler for each uri
 pub(crate) fn parse(input: &str) -> HashMap<String, Vec<Uri>> {
-    // id -> Vec<uri> 
+    // id -> Vec<uri>
     let mut parsed: HashMap<String, Vec<Uri>> = HashMap::new();
 
     let re = Regex::new(r"(github|gitlab)\.(com|ru)[\w\d/\-\.]*").unwrap();
