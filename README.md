@@ -1,6 +1,8 @@
 # librarian
 Programming languages libraries indexer written in Rust
 
+Uses [MeiliSearch](https://github.com/meilisearch/MeiliSearch) as a backend for storing and searching data.
+
 All libraries are stored in JSON format and have following structure:
   
 ```json
