@@ -22,8 +22,8 @@ type ResultErr = (IdUri, Err);
 
 type MyResult = Result<Result<ResultOk, ResultErr>, async_std::future::TimeoutError>;
 
-type RepoUri = String;
-type HandlerUri = String;
+pub(crate) type RepoUri = String;
+pub(crate) type HandlerUri = String;
 
 pub(crate) struct Crawler {
     max_clients: usize,
@@ -35,7 +35,7 @@ pub(crate) struct Crawler {
 
 impl Crawler {
     pub(crate) fn new(
-        uris: HashMap<String, Vec<Uri>>,
+        uris: &HashMap<String, Vec<Uri>>,
         max_clients: usize,
         request_timeout: Duration,
     ) -> Self {

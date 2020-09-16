@@ -35,10 +35,10 @@ fn main() -> Result<(), Error> {
         .merge(config::File::with_name("conf/settings.toml").required(false))
         .unwrap();
 
-    simple_logger::init_with_level(Level::Info).unwrap();
+    simple_logger::init_with_level(Level::Error).unwrap();
 
     let mut sched = Scheduler::new();
-    let go_idx = go_indexer::Indexer::new(Duration::minutes(1));
+    let go_idx = go_indexer::Indexer::new(Duration::minutes(1), 2);
     sched.add_indexer(Box::new(go_idx))?;
 
     task::block_on(sched.run());

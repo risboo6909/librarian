@@ -20,9 +20,15 @@ use http::Uri;
 fn prepare_github_links(uri: Uri) -> Vec<Uri> {
     let uri_path = &uri.path()[1..];
     vec![
-        format!("https://api.github.com/repos/{path}/", path = uri_path,)
-            .parse::<Uri>()
-            .unwrap(),
+        // TODO: github API has limits, figure out other handlers to call
+        // format!("https://api.github.com/repos/{path}/", path = uri_path,)
+        //     .parse::<Uri>()
+        //     .unwrap(),
+        format!(
+            "https://raw.githubusercontent.com/{path}/master/go.mod",
+            path = uri_path,
+        ).parse::<Uri>().unwrap(),
+ 
         format!(
             "https://raw.githubusercontent.com/{path}/master/README.md",
             path = uri_path,
