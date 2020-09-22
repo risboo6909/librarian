@@ -1,10 +1,17 @@
-use crate::crawler::Err;
+use crate::helpers::surf2anyhow;
 use crate::model::Document;
+
 use serde::{Deserialize, Serialize};
 use serde_json;
 
-// Meilisearch api for testing
-pub(crate) const URL: &str = "http://127.0.0.1:7700";
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub(crate) struct MeiliIndexes {
+    uid: String,
+    primary_key: String,
+    created_at: String,
+    updated_at: String,
+}
 
 #[derive(Deserialize, Serialize)]
 // SearchRequest holds parameters for searching
@@ -41,6 +48,29 @@ impl Accountant {
         }
     }
 
+    pub(crate) async fn get_indexes(&self) -> anyhow::Result<Vec<MeiliIndexes>> {
+        let response: Vec<MeiliIndexes> = surf2anyhow(
+            surf::get(format!("{}/indexes", self.meili_url))
+                .recv_json()
+                .await,
+        )?;
+        Ok(response)
+    }
+
+    pub(crate) async fn is_index_exists(&self, index_name: &str) -> anyhow::Result<bool> {
+        let indexes = self.get_indexes().await?;
+        for index in indexes {
+            if index.uid == index_name {
+                return Ok(true);
+            }
+        }
+        Ok(false)
+    }
+
+    pub(crate) async fn create_index(&self, index_name: &str) {
+        todo!();
+    }
+
     // To trigger search you need to construct a search request
     // It is made by creating new SearchRequest object:
     //  let request =  SearchRequest::new("graphics");
@@ -53,21 +83,27 @@ impl Accountant {
     // let request =  SearchRequest::new("graphics").filter_by("target_language = 'All' AND usage = 'AI'");
     // You can also set an offset with SearchRequest::new("graphics").set_offset(10) to tell the engine how many documents to skip
     // or set limit by SearchRequest::new("graphics").set_limit(100) to set a constraint for the quantity of documents listed
-    pub(crate) async fn search(self, req: SearchRequest<'_>) -> Result<Vec<Document>, Err> {
-        let response = surf::post(format!("{}/indexes/libraries/search", URL))
-            .body_json(&req)?
-            .await?
-            .body_string()
-            .await?;
-        let SearchResponse { hits } = serde_json::from_str(response.as_str())?;
+    pub(crate) async fn search(&self, req: SearchRequest<'_>) -> anyhow::Result<Vec<Document>> {
+        let mut req = surf2anyhow(
+            surf::post(format!("{}/indexes/libraries/search", self.meili_url))
+                .body_json(&req)?
+                .await,
+        )?;
+
+        let resp = surf2anyhow(req.body_string().await)?;
+        let SearchResponse { hits } = serde_json::from_str(resp.as_str())?;
+
         Ok(hits)
     }
 
-    pub(crate) async fn send(self, docs: &Vec<Document>) -> Result<String, Err> {
-        let mut response = surf::post(format!("{}/indexes/libraries/documents", URL))
-            .body_json(docs)?
-            .await?;
-        response.body_string().await
+    pub(crate) async fn send(&self, docs: &Vec<Document>) -> anyhow::Result<String> {
+        let mut req = surf2anyhow(
+            surf::post(format!("{}/indexes/libraries/documents", self.meili_url))
+                .body_json(docs)?
+                .await,
+        )?;
+
+        surf2anyhow(req.body_string().await)
     }
 }
 
@@ -80,6 +116,7 @@ impl<'a> SearchRequest<'a> {
             limit: None,
         }
     }
+
     pub(crate) fn filter_by(mut self, filters: &'a str) -> Self {
         self.filters = Some(filters);
         self
@@ -89,6 +126,7 @@ impl<'a> SearchRequest<'a> {
         self.limit = Some(limit);
         self
     }
+
     pub(crate) fn set_offset(mut self, offfset: u32) -> Self {
         self.offset = Some(offfset);
         self

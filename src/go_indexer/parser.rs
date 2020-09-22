@@ -27,8 +27,9 @@ fn prepare_github_links(uri: Uri) -> Vec<Uri> {
         format!(
             "https://raw.githubusercontent.com/{path}/master/go.mod",
             path = uri_path,
-        ).parse::<Uri>().unwrap(),
- 
+        )
+        .parse::<Uri>()
+        .unwrap(),
         format!(
             "https://raw.githubusercontent.com/{path}/master/README.md",
             path = uri_path,

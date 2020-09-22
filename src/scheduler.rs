@@ -10,6 +10,9 @@ use log::{error, info};
 
 #[async_trait]
 pub(crate) trait IndexerTrait {
+    // contains code that should be runned before indexes refresh/update
+    async fn pre_run(&mut self) -> anyhow::Result<()>;
+
     // should be called to refresh existent index
     async fn refresh_index(&mut self) -> anyhow::Result<()>;
 
@@ -91,33 +94,55 @@ impl Scheduler {
         Ok(())
     }
 
+    fn enqueue_indexer(&mut self, indexer: Box<dyn IndexerTrait>) {
+        let delay = indexer.next_start_delay();
+        self.indexers.push(Item {
+            next_start_ts: delay.num_seconds() as usize + Scheduler::now(),
+            indexer,
+        })
+    }
+
     pub(crate) async fn run(&mut self) -> anyhow::Result<()> {
         while let Some(Item {
             next_start_ts,
             mut indexer,
         }) = self.indexers.pop()
         {
+            // execution time has came
+
             if next_start_ts <= Scheduler::now() {
+                match indexer.pre_run().await {
+                    Ok(_) => (),
+                    Err(err) => {
+                        error!("{}", err);
+                        self.enqueue_indexer(indexer);
+                        continue;
+                    }
+                }
+
                 info!("starting update for {}", indexer.get_id());
                 match indexer.update_index().await {
                     Ok(_) => (),
-                    Err(err) => error!("{}", err),
+                    Err(err) => {
+                        error!("{}", err);
+                        self.enqueue_indexer(indexer);
+                        continue;
+                    }
                 };
 
-                info!("starting refresh for {}", indexer.get_id());
-                //indexer.refresh_index()?;
+                //info!("starting refresh for {}", indexer.get_id());
+                //indexer.refresh_index();
 
                 // enqueue task again
-                let delay = indexer.next_start_delay();
-                self.indexers.push(Item {
-                    next_start_ts: delay.num_seconds() as usize + Scheduler::now(),
-                    indexer,
-                })
+                self.enqueue_indexer(indexer);
             } else {
+                // we still have to wait
+
                 self.indexers.push(Item {
                     next_start_ts,
                     indexer,
                 });
+
                 let now = Scheduler::now();
                 if next_start_ts >= now {
                     let delta = next_start_ts - now;
